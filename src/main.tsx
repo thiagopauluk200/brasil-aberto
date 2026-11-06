@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen, Building2, Check, ChevronDown, CircleHelp, Database, ExternalLink, FileText, Landmark, Layers3, LoaderCircle, MapPin, Search, SlidersHorizontal, Users, Wallet, X } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { loadMunicipalities } from '../shared/municipalities.mjs';
 import './styles.css';
 
 type City = { id: string; name: string; uf: string };
@@ -34,9 +35,20 @@ function CitySearch({ city, onChange }: { city: City; onChange: (city: City) => 
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
   const container = useRef<HTMLDivElement>(null);
-  const load = () => { setError(''); get<City[]>('/api/municipalities').then(setCities).catch(error => setError(error.message)); };
-  useEffect(load, []);
+  useEffect(() => {
+    const controller = new AbortController();
+    setError(''); setLoading(true);
+    loadMunicipalities({
+      fallbackUrl: `${import.meta.env.BASE_URL}data/municipalities.json`,
+      signal: controller.signal,
+    }).then(result => { if (!controller.signal.aborted) setCities(result); })
+      .catch(() => { if (!controller.signal.aborted) setError('Não foi possível carregar a lista de municípios. Tente novamente.'); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [attempt]);
   useEffect(() => {
     const close = (event: MouseEvent) => { if (!container.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', close);
@@ -48,8 +60,8 @@ function CitySearch({ city, onChange }: { city: City; onChange: (city: City) => 
     <button className="city-trigger" onClick={() => setOpen(!open)} aria-expanded={open}><MapPin size={17} /><span>{city.name}, {city.uf}</span><ChevronDown size={15} /></button>
     {open && <div className="search-menu" onKeyDown={event => { if (event.key === 'Escape') setOpen(false); }}>
       <div className="search-input"><Search size={17} /><input autoFocus placeholder="Buscar município ou UF…" aria-label="Buscar município ou UF" value={query} onChange={e => setQuery(e.target.value)} /></div>
-      <div className="search-results">{matches.map(c => <button key={c.id} onClick={() => { onChange(c); setOpen(false); setQuery(''); }}><span>{c.name} <small>{c.uf}</small></span>{city.id === c.id && <Check size={15} />}</button>)}
-      {!matches.length && <p>{error || (cities.length ? 'Nenhum município encontrado.' : 'Carregando municípios…')}</p>}{error && <button onClick={load}>Tentar novamente</button>}</div>
+      <div className="search-results" aria-busy={loading}>{matches.map(c => <button key={c.id} onClick={() => { onChange(c); setOpen(false); setQuery(''); }}><span>{c.name} <small>{c.uf}</small></span>{city.id === c.id && <Check size={15} />}</button>)}
+      {loading && <p role="status">Carregando municípios…</p>}{error && <p role="alert">{error}</p>}{!loading && !error && !matches.length && <p>Nenhum município encontrado.</p>}{error && <button onClick={() => setAttempt(value => value + 1)}>Tentar novamente</button>}</div>
     </div>}
   </div>;
 }
@@ -177,7 +189,7 @@ function ExpenseTable({ rows, stage, total, population }: { rows: Expense[]; sta
 }
 function Sources() {
   const sources = [
-    { name: 'IBGE', tag: 'INTEGRADO', description: 'Cadastro de municípios e população residente do Censo Demográfico 2022, tabela SIDRA 4714.', href: 'https://servicodados.ibge.gov.br/api/docs/localidades', icon: <MapPin size={23} /> },
+    { name: 'IBGE', tag: 'INTEGRADO', description: 'Catálogo de municípios consultado diretamente no IBGE, com cópia de reserva no site. População residente do Censo Demográfico 2022, tabela SIDRA 4714.', href: 'https://servicodados.ibge.gov.br/api/docs/localidades', icon: <MapPin size={23} /> },
     { name: 'Tesouro Nacional · Siconfi', tag: 'INTEGRADO', description: 'Despesas anuais por função e etapa. DCA, anexo I-E, exceto intraorçamentárias. Disponibilidade varia por município e exercício.', href: 'https://apidatalake.tesouro.gov.br/docs/siconfi/', icon: <Landmark size={23} /> },
     { name: 'Portal da Transparência', tag: 'REQUER CHAVE', description: 'Conector de Bolsa Família por município preparado no servidor. Configure a chave no .env para consultar benefícios federais.', href: 'https://portaldatransparencia.gov.br/api-de-dados', icon: <Users size={23} /> },
     { name: 'dados.gov.br', tag: 'CATÁLOGO EXTERNO', description: 'Explore conjuntos de dados de órgãos públicos. Nesta versão, o acesso é por link; a API do catálogo ainda não está integrada.', href: 'https://dados.gov.br/dados/conjuntos-dados', icon: <Database size={23} /> },

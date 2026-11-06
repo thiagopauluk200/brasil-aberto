@@ -2,14 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 
-test('backend publicado responde health check, restringe CORS e limita consultas', { timeout: 15000 }, async t => {
-  const child = spawn(process.execPath, ['server/index.mjs'], {
+async function startServer(t, { offline = false } = {}) {
+  const command = offline
+    ? ['--input-type=module', '--eval', "globalThis.fetch = async () => { throw new Error('IBGE indisponível no teste'); }; await import('./server/index.mjs');"]
+    : ['server/index.mjs'];
+  const child = spawn(process.execPath, command, {
     cwd: new URL('..', import.meta.url),
     env: { ...process.env, PORT: '0', HOST: '127.0.0.1', TRUST_PROXY: '', ALLOWED_ORIGINS: 'https://portfolio.github.io' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   t.after(() => child.kill());
-  const base = await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let output = '';
     const timer = setTimeout(() => reject(new Error('O servidor não iniciou.')), 7000);
     child.on('error', error => { clearTimeout(timer); reject(error); });
@@ -20,6 +23,10 @@ test('backend publicado responde health check, restringe CORS e limita consultas
       if (url) { clearTimeout(timer); resolve(url); }
     });
   });
+}
+
+test('backend publicado responde health check, restringe CORS e limita consultas', { timeout: 15000 }, async t => {
+  const base = await startServer(t);
   const allowed = await fetch(`${base}/api/health`, { headers: { Origin: 'https://portfolio.github.io' } });
   assert.equal(allowed.status, 200);
   assert.deepEqual(await allowed.json(), { status: 'ok' });
@@ -35,4 +42,15 @@ test('backend publicado responde health check, restringe CORS e limita consultas
   assert.equal(limited.status, 429);
   assert.match((await limited.json()).error, /Aguarde/);
   assert.equal((await fetch(`${base}/api/health`)).status, 200);
+});
+
+test('catálogo mantém Registro e demais municípios mesmo com IBGE indisponível no servidor', { timeout: 15000 }, async t => {
+  const base = await startServer(t, { offline: true });
+  const response = await fetch(`${base}/api/municipalities`);
+  assert.equal(response.status, 200);
+  assert.ok(response.headers.get('X-Municipalities-Reference'));
+  const items = await response.json();
+  assert.ok(items.length > 5000);
+  assert.deepEqual(items.find(city => city.id === '3542602'), { id: '3542602', name: 'Registro', uf: 'SP' });
+  assert.ok(items.some(city => city.name === 'Curitiba' && city.uf === 'PR'));
 });

@@ -1,9 +1,14 @@
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import { normalizeExpenses, validateSelection } from './domain.mjs';
+import { IBGE_MUNICIPALITIES_URL, normalizeMunicipalities } from '../shared/municipalities.mjs';
+
+const municipalitySnapshot = JSON.parse(await readFile(new URL('../public/data/municipalities.json', import.meta.url), 'utf8'));
+const cachedMunicipalities = normalizeMunicipalities(municipalitySnapshot.items);
 
 const app = express();
 app.disable('x-powered-by');
@@ -26,7 +31,6 @@ app.use('/api', rateLimit({
 const cache = new Map();
 let treasuryQueue = Promise.resolve();
 let lastTreasury = 0;
-const IBGE = 'https://servicodados.ibge.gov.br/api/v1/localidades';
 const TESOURO = 'https://apidatalake.tesouro.gov.br/ords/siconfi/tt/dca';
 
 async function upstream(url, headers = {}) {
@@ -54,11 +58,14 @@ function treasury(url) {
 }
 
 app.get('/api/municipalities', async (_req, res) => {
-  const data = await upstream(`${IBGE}/municipios?orderBy=nome`);
-  res.json(data.map(city => ({
-    id: String(city.id), name: city.nome,
-    uf: city.microrregiao?.mesorregiao?.UF?.sigla ?? city['regiao-imediata']?.['regiao-intermediaria']?.UF?.sigla ?? '',
-  })));
+  try {
+    const data = await upstream(IBGE_MUNICIPALITIES_URL);
+    res.json(normalizeMunicipalities(data));
+  } catch {
+    // Mantém compatibilidade com clientes antigos quando o IBGE não responde à hospedagem.
+    res.set('X-Municipalities-Reference', municipalitySnapshot.updatedAt);
+    res.json(cachedMunicipalities);
+  }
 });
 
 app.get('/api/dashboard', async (req, res) => {

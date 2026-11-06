@@ -107,6 +107,8 @@ flowchart LR
 
 Ao trocar o município ou o exercício, a interface solicita os dados ao servidor. A API consulta orçamento e população de forma independente, trata as respostas e devolve um JSON para o painel. Trocar a etapa da despesa reaproveita os dados já recebidos.
 
+O cadastro de municípios é consultado diretamente no IBGE pelo navegador. Se a fonte não responder em até cinco segundos, a busca utiliza uma cópia oficial incluída no site, com origem e data de referência em [`public/data/municipalities.json`](public/data/municipalities.json). Assim, a busca não depende da comunicação entre o Render e o IBGE. Atualize a cópia com `npm run update:municipalities` e publique as alterações.
+
 O backend mantém **cache em memória por 15 minutos**, utiliza timeout de 30 segundos nas consultas externas e organiza os acessos ao Tesouro em uma fila com intervalo mínimo de 1,1 segundo. Também limita a API a 60 consultas por minuto por IP e verifica a paginação para evitar resultados incompletos.
 
 Não há banco de dados nesta versão. O cache é descartado quando o servidor reinicia.
@@ -154,10 +156,11 @@ Solicite a credencial no [cadastro oficial](https://portaldatransparencia.gov.br
 | --- | --- |
 | `npm run dev` | Iniciar a interface e a API em desenvolvimento, com atualização ao editar arquivos. |
 | `npm test` | Executar os testes de normalização, validação e comportamento HTTP. |
+| `npm run update:municipalities` | Atualizar a cópia de reserva do cadastro de municípios com dados oficiais do IBGE. |
 | `npm run build` | Verificar os tipos TypeScript e gerar os arquivos da interface em `dist`. |
 | `npm start` | Iniciar o servidor; após o build, servir também a interface em http://127.0.0.1:3001. |
 
-Os testes cobrem prevenção de dupla contagem, distinção entre zero e ausência, rejeição de duplicações, validação dos filtros, CORS, health check e limite de consultas.
+Os testes cobrem prevenção de dupla contagem, distinção entre zero e ausência, rejeição de duplicações, validação dos filtros, CORS, health check, limite de consultas e carregamento do catálogo com falha do IBGE.
 
 ## 📁 Estrutura do projeto
 
@@ -169,13 +172,18 @@ brasil-aberto/
 │   ├── assets/cover.svg     # Capa do README
 │   └── DEPLOY.md           # Guia de publicação
 ├── public/
+│   ├── data/municipalities.json # Cópia de reserva do cadastro oficial do IBGE
 │   └── favicon.svg
 ├── scripts/
+│   ├── update-municipalities.mjs # Atualização do cadastro de reserva
 │   └── validate-deploy.mjs # Validação da URL da API no deploy
+├── shared/
+│   └── municipalities.mjs  # Carregamento e validação do cadastro de municípios
 ├── server/
 │   ├── index.mjs           # Rotas, conectores, cache e fila de consultas
 │   ├── domain.mjs          # Validação e normalização do orçamento
 │   ├── domain.test.mjs     # Testes das regras de tratamento
+│   ├── municipalities.test.mjs # Testes de carga e reserva do catálogo
 │   └── http.test.mjs       # Testes HTTP do servidor
 ├── src/
 │   ├── main.tsx            # Painel e componentes React
