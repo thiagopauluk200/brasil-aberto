@@ -1,0 +1,52 @@
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v7
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Configurar Pages
+        id: pages
+        uses: actions/configure-pages@v6
+      - name: Validar URL da API
+        run: node scripts/validate-deploy.mjs
+      - name: Instalar dependências
+        run: npm ci
+      - name: Testar
+        run: npm test
+      - name: Gerar site
+        run: npm run build
+        env:
+          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+      - name: Preparar arquivos
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v5
