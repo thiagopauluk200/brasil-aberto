@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Brasil Aberto</title>
+  <desc id="desc">Dados públicos que aproximam você da sua cidade. Capa ilustrativa com barras e pontos conectados em tons de verde.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1200" y2="340" gradientUnits="userSpaceOnUse"><stop stop-color="#103A2D"/><stop offset="1" stop-color="#245C43"/></linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="190" gradientUnits="userSpaceOnUse"><stop stop-color="#DDF0AC"/><stop offset="1" stop-color="#8AB285"/></linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="#DDECBF" opacity=".11"/></pattern>
+  </defs>
+  <rect width="1200" height="340" rx="24" fill="url(#background)"/>
+  <rect width="1200" height="340" rx="24" fill="url(#dots)"/>
+  <circle cx="1118" cy="35" r="215" stroke="#BBD69C" stroke-opacity=".1"/>
+  <circle cx="1118" cy="35" r="160" stroke="#BBD69C" stroke-opacity=".08"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="55" y="49" width="213" height="29" rx="14.5" fill="#D7ECC5" fill-opacity=".09" stroke="#D7ECC5" stroke-opacity=".16"/>
+    <circle cx="72" cy="63.5" r="3.5" fill="#D5EFA7"/>
+    <text x="85" y="68" fill="#D5E6C9" font-size="10" font-weight="600" letter-spacing="1.7">DADOS QUE APROXIMAM</text>
+    <text x="53" y="159" fill="#F4F7EA" font-size="67" font-weight="700" letter-spacing="-2.8">brasil<tspan fill="#D6EEAA" font-weight="400">aberto</tspan></text>
+    <text x="56" y="206" fill="#C5D8BD" font-size="20">Sua cidade, em números.</text>
+    <text x="56" y="278" fill="#AFC7A2" font-size="10" letter-spacing="2">MUNICÍPIOS</text>
+    <circle cx="152" cy="274" r="2" fill="#849F73"/>
+    <text x="170" y="278" fill="#AFC7A2" font-size="10" letter-spacing="2">TRANSPARÊNCIA</text>
+    <circle cx="303" cy="274" r="2" fill="#849F73"/>
+    <text x="321" y="278" fill="#AFC7A2" font-size="10" letter-spacing="2">CIDADANIA</text>
+  </g>
+  <g transform="translate(782 57)">
+    <rect width="350" height="225" rx="15" fill="#0F3529" fill-opacity=".5" stroke="#B7D19E" stroke-opacity=".23"/>
+    <circle cx="21" cy="22" r="3" fill="#CAE2AE"/>
+    <circle cx="34" cy="22" r="3" fill="#CAE2AE" opacity=".45"/>
+    <circle cx="47" cy="22" r="3" fill="#CAE2AE" opacity=".25"/>
+    <path d="M25 60H325M25 105H325M25 150H325M25 195H325" stroke="#C5DBAF" stroke-opacity=".1"/>
+    <rect x="42" y="127" width="37" height="68" rx="5" fill="#87AB7F"/>
+    <rect x="99" y="96" width="37" height="99" rx="5" fill="#A3C18C"/>
+    <rect x="156" y="115" width="37" height="80" rx="5" fill="#87AB7F"/>
+    <rect x="213" y="68" width="37" height="127" rx="5" fill="#C2DC9E"/>
+    <rect x="270" y="47" width="37" height="148" rx="5" fill="#D6EEAA"/>
+    <path d="M60 109L117 78L174 97L231 50L288 29" stroke="#E7F3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+    <circle cx="60" cy="109" r="3" fill="#E7F3C9"/><circle cx="117" cy="78" r="3" fill="#E7F3C9"/><circle cx="174" cy="97" r="3" fill="#E7F3C9"/><circle cx="231" cy="50" r="3" fill="#E7F3C9"/><circle cx="288" cy="29" r="3" fill="#E7F3C9"/>
+  </g>
+</svg>

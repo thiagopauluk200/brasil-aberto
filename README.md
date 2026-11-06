@@ -1,159 +1,223 @@
-# Brasil Aberto
+<div align="center">
 
-Painel de dados públicos para entender o orçamento dos municípios brasileiros. Projeto independente de portfólio com React, TypeScript, Node.js e APIs oficiais.
+<img src="docs/assets/cover.svg" alt="Brasil Aberto — dados públicos que aproximam você da sua cidade" width="100%" />
 
-## Executar
+<br />
 
-Requer Node.js 22.12+ e npm.
+**Entenda o orçamento da sua cidade com dados públicos e fontes oficiais.**
 
-```sh
-npm install
+Um painel para explorar despesas municipais, conhecer indicadores e transformar números em informação acessível.
+
+[![Publicação](https://github.com/thiagopauluk200/brasil-aberto/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/thiagopauluk200/brasil-aberto/actions/workflows/deploy-pages.yml)
+![React](https://img.shields.io/badge/React-19-149ECA?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24-417E38?style=flat-square&logo=nodedotjs&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite&logoColor=white)
+
+**[Acessar o painel](https://thiagopauluk200.github.io/brasil-aberto/)** · **[Conhecer as funcionalidades](#-funcionalidades)** · **[Executar localmente](#-executar-localmente)**
+
+</div>
+
+---
+
+## 🇧🇷 Sobre o projeto
+
+O **Brasil Aberto** é uma plataforma de visualização de dados públicos dos municípios brasileiros. A proposta é aproximar a população das informações sobre sua cidade, reunindo consultas a fontes oficiais em uma interface simples de explorar.
+
+Quanto o município pagou em saúde? Qual é a participação da educação nas despesas? Qual a diferença entre um valor empenhado e um valor efetivamente pago? O painel ajuda a investigar essas perguntas com filtros, gráficos e acesso à origem dos dados.
+
+Desenvolvido como projeto de portfólio, reúne desenvolvimento de interface, construção de API, integração com serviços externos e tratamento de dados orçamentários. É uma iniciativa independente, sem vínculo governamental.
+
+## ✨ Funcionalidades
+
+| Recurso | O que você pode fazer |
+| --- | --- |
+| **Busca por município** | Encontrar cidades por nome ou UF a partir do cadastro oficial do IBGE. |
+| **Filtros de orçamento** | Selecionar o exercício e alternar entre despesas empenhadas, liquidadas e pagas. |
+| **Indicadores em destaque** | Consultar total de despesas da etapa, população residente, saúde e educação. |
+| **Distribuição por área** | Identificar como os recursos se distribuem entre as funções de governo. |
+| **Execução orçamentária** | Visualizar lado a lado os valores empenhados, liquidados e pagos do exercício. |
+| **Tabela de despesas** | Buscar áreas, ordenar valores e consultar participação no total e valor por habitante. |
+| **Exportação CSV** | Baixar o detalhamento da etapa selecionada, com município, ano, valores e fonte. |
+| **Benefícios federais** | Consultar Bolsa Família por município e mês quando a chave da API estiver configurada. |
+| **Fontes e metodologia** | Entender o recorte dos dados e acessar as fontes oficiais. |
+| **Experiência responsiva** | Explorar o painel em diferentes tamanhos de tela, com estados de carregamento, erro e nova tentativa. |
+
+### Entenda as etapas da despesa
+
+| Etapa | Significado |
+| --- | --- |
+| **Empenhada** | O governo assumiu um compromisso e reservou parte do orçamento para a despesa. |
+| **Liquidada** | Foi verificado o direito do credor, como a entrega de um produto ou serviço. |
+| **Paga** | O pagamento foi realizado. É a etapa exibida inicialmente no painel. |
+
+## 🗂️ Dados e integrações
+
+| Fonte | Uso no projeto | Disponibilidade |
+| --- | --- | --- |
+| [IBGE · Localidades](https://servicodados.ibge.gov.br/api/docs/localidades) | Cadastro de municípios e unidades da federação. | Integrado |
+| [IBGE · SIDRA](https://sidra.ibge.gov.br/tabela/4714) | População residente do Censo Demográfico 2022, tabela 4714, variável 93. | Integrado |
+| [Tesouro Nacional · Siconfi](https://apidatalake.tesouro.gov.br/docs/siconfi/) | Despesas anuais por função e etapa, a partir da DCA, anexo I-E. | Integrado |
+| [Portal da Transparência](https://portaldatransparencia.gov.br/api-de-dados) | Conector de Bolsa Família por município e mês. | Requer chave no servidor; validação com credencial pendente |
+| [dados.gov.br](https://dados.gov.br/dados/conjuntos-dados) | Acesso ao catálogo para explorar outros conjuntos públicos. | Link externo; API ainda não integrada |
+
+> O painel principal funciona sem chave de API. A credencial do Portal da Transparência é necessária apenas para a consulta de benefícios federais.
+
+### Como os números são tratados
+
+- **Recorte do orçamento:** o total utiliza a linha “Despesas Exceto Intraorçamentárias” do anexo I-E da DCA.
+- **Sem dupla contagem:** o detalhamento utiliza funções, como `10 - Saúde`. Subfunções, como `10.301 - Atenção Básica`, não são somadas novamente.
+- **Referência populacional:** a população e o cálculo por habitante usam o **Censo 2022**, mesmo quando outro exercício é selecionado.
+- **Valores nominais:** as despesas são apresentadas em reais, sem correção pela inflação.
+- **Disponibilidade:** a existência de dados depende das declarações do município e da disponibilidade das fontes. Ausência de registro não comprova gasto zero.
+- **Escopos distintos:** os benefícios federais não são somados ao orçamento municipal.
+
+A data exibida no painel informa quando a consulta foi realizada. Ela não representa a data de publicação pelo órgão. O projeto não realiza auditoria nem avalia a qualidade dos gastos.
+
+## 🛠️ Tecnologias
+
+| Camada | Tecnologias |
+| --- | --- |
+| **Interface** | React 19, TypeScript e CSS responsivo |
+| **Visualizações** | Recharts |
+| **Ícones** | Lucide React |
+| **Build e desenvolvimento** | Vite e Concurrently |
+| **Servidor** | Node.js e Express 5 |
+| **Comunicação** | Fetch API e JSON |
+| **Acesso entre serviços** | CORS com origens configuráveis |
+| **Limite de consultas** | express-rate-limit |
+| **Testes** | Node.js Test Runner e Assert |
+| **Publicação** | GitHub Actions, GitHub Pages e Render |
+
+## 🔄 Como funciona
+
+```mermaid
+flowchart LR
+    A[Visitante escolhe cidade e ano] --> B[Interface React]
+    B --> C[API Node.js / Express]
+    C --> D[IBGE]
+    C --> E[Tesouro / Siconfi]
+    C --> F[Portal da Transparência · opcional]
+    D --> G[Validação e tratamento]
+    E --> G
+    F --> G
+    G --> B
+    B --> H[Indicadores, gráficos, tabela e CSV]
+```
+
+Ao trocar o município ou o exercício, a interface solicita os dados ao servidor. A API consulta orçamento e população de forma independente, trata as respostas e devolve um JSON para o painel. Trocar a etapa da despesa reaproveita os dados já recebidos.
+
+O backend mantém **cache em memória por 15 minutos**, utiliza timeout de 30 segundos nas consultas externas e organiza os acessos ao Tesouro em uma fila com intervalo mínimo de 1,1 segundo. Também limita a API a 60 consultas por minuto por IP e verifica a paginação para evitar resultados incompletos.
+
+Não há banco de dados nesta versão. O cache é descartado quando o servidor reinicia.
+
+## 🚀 Executar localmente
+
+### Pré-requisitos
+
+- **Node.js 24**, versão indicada no arquivo [`.node-version`](.node-version).
+- **npm**, incluído na instalação do Node.js.
+- **Git**, para clonar o repositório.
+
+### Instalação
+
+```bash
+git clone https://github.com/thiagopauluk200/brasil-aberto.git
+cd brasil-aberto
+npm ci
 npm run dev
 ```
 
-Abra o endereço local impresso pelo Vite (normalmente http://127.0.0.1:5173). O servidor da API usa a porta 3001. Em desenvolvimento, o Vite encaminha `/api` para ele.
-
-```sh
-npm test
-npm run build
-npm start
-```
-
-Depois do build, `npm start` serve o painel e a API em http://127.0.0.1:3001. O endereço de escuta pode ser configurado por `HOST` e a porta por `PORT`. Para hospedar a API em um serviço público, configure `HOST=0.0.0.0`. A interface também pode ser publicada separadamente no GitHub Pages, conforme o passo a passo abaixo.
-
-## Publicar no GitHub Pages com a API no Render
-
-O projeto tem duas partes: a interface React, que é transformada em arquivos estáticos pelo Vite, e a API Node.js/Express, que consulta as fontes públicas. O GitHub Pages hospeda os arquivos da interface; o servidor precisa de uma hospedagem com Node.js. Essa separação segue o funcionamento descrito na [documentação do GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
-
-```text
-Visitante → GitHub Pages (interface) → Render (API) → IBGE / Tesouro / Transparência
-```
-
-### 1. Enviar o código para um repositório
-
-No GitHub, crie um repositório público vazio chamado `brasil-aberto`. Não adicione README, licença ou `.gitignore` na criação, pois estes arquivos serão enviados da sua pasta. No terminal, aberto na pasta do projeto, execute cada comando abaixo, substituindo `SEU_USUARIO` pelo seu nome de usuário:
-
-```sh
-git init
-git branch -M main
-git add .
-git commit -m "Adiciona painel Brasil Aberto"
-git remote add origin https://github.com/thiagopauluk200/brasil-aberto.git
-git push -u origin main
-```
-
-Se o Git pedir autenticação ou configuração de nome e e-mail, conclua essa configuração antes de repetir o comando que falhou. O `.gitignore` já exclui `.env`, `dados_api.txt`, `node_modules` e `dist`. Antes do commit, confira `git status` para verificar os arquivos que serão enviados.
-
-### 2. Hospedar a API no Render
-
-No [painel do Render](https://dashboard.render.com/), escolha **New → Web Service**, conecte o repositório e use:
-
-| Campo | Valor |
+| Serviço | Endereço local |
 | --- | --- |
-| Branch | `main` |
-| Language / Runtime | `Node` |
-| Root Directory | Raiz do repositório; deixe vazio |
-| Build Command | `npm ci` |
-| Start Command | `npm start` |
-| Health Check Path | `/api/health` |
+| Interface | http://127.0.0.1:5173 |
+| API | http://127.0.0.1:3001 |
+| Verificação da API | http://127.0.0.1:3001/api/health |
 
-O serviço da API não precisa executar `npm run build`; o build da interface será feito pelo GitHub Actions. Escolha e confira o plano e os custos apresentados no painel antes de criar o serviço. Consulte também o [guia oficial para Express no Render](https://render.com/docs/deploy-node-express-app).
+O Vite encaminha as chamadas de `/api` ao servidor local. A porta da interface pode mudar se já estiver ocupada; confira a saída do terminal.
 
-Configure estas variáveis de ambiente no serviço:
+### Configuração opcional
 
-| Variável | Valor |
+Para usar o Portal da Transparência, copie [`.env.example`](.env.example) para `.env` e preencha:
+
+```dotenv
+TRANSPARENCIA_API_KEY=sua_chave_aqui
+```
+
+Solicite a credencial no [cadastro oficial](https://portaldatransparencia.gov.br/api-de-dados/cadastrar-email), seguindo as instruções de autenticação gov.br. Reinicie o servidor após configurar a variável.
+
+**A chave deve permanecer no servidor.** O `.env` está no `.gitignore`; não coloque credenciais em variáveis com prefixo `VITE_`, pois seus valores são incorporados ao JavaScript da interface.
+
+### Comandos disponíveis
+
+| Comando | Finalidade |
 | --- | --- |
-| `HOST` | `0.0.0.0` |
-| `NODE_ENV` | `production` |
-| `ALLOWED_ORIGINS` | `https://SEU_USUARIO.github.io` |
-| `TRUST_PROXY` | `1` no Render |
-| `TRANSPARENCIA_API_KEY` | Opcional: chave do Portal da Transparência |
+| `npm run dev` | Iniciar a interface e a API em desenvolvimento, com atualização ao editar arquivos. |
+| `npm test` | Executar os testes de normalização, validação e comportamento HTTP. |
+| `npm run build` | Verificar os tipos TypeScript e gerar os arquivos da interface em `dist`. |
+| `npm start` | Iniciar o servidor; após o build, servir também a interface em http://127.0.0.1:3001. |
 
-`ALLOWED_ORIGINS` recebe apenas a origem: protocolo e domínio, sem `/brasil-aberto` e sem barra final. Ela permite que o navegador da interface consulte a API. `TRUST_PROXY=1` considera o proxy que fica na frente do Node.js no Render. A variável `PORT` é fornecida pela plataforma; não é necessário defini-la manualmente. O [Render exige escuta em `0.0.0.0`](https://render.com/docs/web-services#port-binding).
+Os testes cobrem prevenção de dupla contagem, distinção entre zero e ausência, rejeição de duplicações, validação dos filtros, CORS, health check e limite de consultas.
 
-Depois da publicação, abra `https://NOME-DO-SEU-SERVICO.onrender.com/api/health` e confira a resposta JSON. A raiz do backend pode responder com JSON e status 404, pois o serviço não contém a pasta `dist`; isso é esperado. O endereço para o visitante será o GitHub Pages.
-
-### 3. Informar à interface onde está a API
-
-No repositório do GitHub, abra **Settings → Secrets and variables → Actions → Variables → New repository variable** e cadastre:
+## 📁 Estrutura do projeto
 
 ```text
-Name:  VITE_API_BASE_URL
-Value: https://NOME-DO-SEU-SERVICO.onrender.com
+brasil-aberto/
+├── .github/workflows/
+│   └── deploy-pages.yml     # Testes, build e publicação da interface
+├── docs/
+│   ├── assets/cover.svg     # Capa do README
+│   └── DEPLOY.md           # Guia de publicação
+├── public/
+│   └── favicon.svg
+├── scripts/
+│   └── validate-deploy.mjs # Validação da URL da API no deploy
+├── server/
+│   ├── index.mjs           # Rotas, conectores, cache e fila de consultas
+│   ├── domain.mjs          # Validação e normalização do orçamento
+│   ├── domain.test.mjs     # Testes das regras de tratamento
+│   └── http.test.mjs       # Testes HTTP do servidor
+├── src/
+│   ├── main.tsx            # Painel e componentes React
+│   ├── styles.css          # Identidade visual e responsividade
+│   └── vite-env.d.ts       # Tipos das variáveis do Vite
+├── .env.example
+├── index.html
+├── package.json
+└── vite.config.ts
 ```
 
-Use a URL HTTPS real do serviço, sem `/api` e sem barra final. Por exemplo, `https://brasil-aberto-api.onrender.com`. O código acrescenta `/api/dashboard`, `/api/municipalities` e os demais caminhos automaticamente.
+## 🌐 Publicação
 
-Essa variável contém um endereço público. Nunca coloque a chave do Portal da Transparência nela ou em qualquer variável `VITE_`: o Vite incorpora esses valores no JavaScript que todo visitante pode baixar. A chave permanece apenas no ambiente do backend. Veja a [documentação de variáveis do Vite](https://vite.dev/guide/env-and-mode#env-variables).
+A interface é publicada no **GitHub Pages** e consulta a API hospedada no **Render**.
 
-### 4. Ativar o GitHub Pages
+- **Painel:** [thiagopauluk200.github.io/brasil-aberto](https://thiagopauluk200.github.io/brasil-aberto/)
+- **Verificação da API:** [brasil-aberto.onrender.com/api/health](https://brasil-aberto.onrender.com/api/health)
+- **Automação:** [workflow de publicação](.github/workflows/deploy-pages.yml)
 
-No repositório, abra **Settings → Pages → Build and deployment → Source** e selecione **GitHub Actions**. Depois abra a aba **Actions**, selecione o workflow de publicação e execute **Run workflow** na branch `main`.
+O workflow instala as dependências, executa os testes, gera o build e publica os arquivos estáticos. A variável `VITE_API_BASE_URL` informa à interface o endereço público do backend. O caminho dos arquivos é ajustado automaticamente para o GitHub Pages.
 
-O arquivo `.github/workflows/deploy-pages.yml` já prepara a publicação: instala as dependências com `npm ci`, executa `npm test`, gera o build e publica `dist`. O caminho `VITE_BASE_PATH` é ajustado automaticamente com os metadados de `configure-pages`, incluindo o prefixo `/brasil-aberto/`. Não é necessário editar esse caminho ao trocar o nome do repositório. O fluxo está baseado nos guias oficiais de [deploy do Vite no GitHub Pages](https://vite.dev/guide/static-deploy.html#github-pages) e de [workflows de Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+**[Consultar o guia completo de publicação →](docs/DEPLOY.md)**
 
-O workflow falha se `VITE_API_BASE_URL` estiver ausente ou não tiver o formato HTTPS esperado, sem caminho, usuário, senha ou parâmetros. Essa validação confere o formato, não se o serviço está online. Depois de cadastrar ou alterar a variável, execute novamente o workflow: o valor é incorporado durante o build.
+## 🧭 Próximas evoluções
 
-Quando o workflow terminar com sucesso, a URL aparecerá no resultado da publicação e em **Settings → Pages**. Para o repositório deste exemplo, o endereço esperado é:
+- [ ] Comparação entre municípios.
+- [ ] Séries históricas das despesas.
+- [ ] Correção de valores pela inflação.
+- [ ] Cache persistente e armazenamento de consultas.
+- [ ] Integração com a API do catálogo dados.gov.br.
+- [ ] Ampliar a cobertura de testes e a observabilidade do servidor.
 
-```text
-https://SEU_USUARIO.github.io/brasil-aberto/
-```
+## 👨‍💻 Autor
 
-Os exemplos de domínio e usuário deste guia são placeholders, não endereços de serviços já publicados. Apenas enviar a pasta `dist` ou selecionar uma branch no Pages não configura o servidor da API; neste projeto, o workflow realiza a publicação da interface e o Render executa o backend.
+Desenvolvido por **[thiagopauluk200](https://github.com/thiagopauluk200)** como projeto de portfólio para aplicar desenvolvimento web e integração de dados públicos a um problema de interesse coletivo.
 
-### 5. Atualizar e verificar
+Encontrou um problema ou tem uma sugestão? [Abra uma issue](https://github.com/thiagopauluk200/brasil-aberto/issues).
 
-Depois de modificar o projeto, execute `npm test` e `npm run build` localmente. Envie as alterações com um novo commit e `git push`; a branch `main` dispara novamente a publicação da interface. O serviço conectado ao Render também pode publicar automaticamente a API conforme sua configuração de deploy.
+---
 
-Se o painel abrir, mas os dados não carregarem, confira a resposta de `/api/health`, o valor de `VITE_API_BASE_URL`, os logs do Render e se `ALLOWED_ORIGINS` contém exatamente a origem do Pages. Se usar um domínio próprio depois, atualize essa origem no backend.
+<div align="center">
 
-## Funcionalidades
+**Brasil Aberto · Informação pública, mais próxima de você.**
 
-- Busca de municípios e UF com cadastro oficial do IBGE.
-- Filtros de exercício e etapa: empenhado, liquidado e pago.
-- População do Censo 2022, despesas de saúde e educação.
-- Distribuição do orçamento por função e comparação entre etapas.
-- Tabela ordenável, busca por área e exportação CSV com origem dos dados.
-- Estados de carregamento, indisponibilidade parcial, ausência de dados e nova tentativa.
-- Conector opcional de Bolsa Família pelo Portal da Transparência.
-- Interface responsiva, guia de leitura, fontes e metodologia.
-
-## Fontes e metodologia
-
-**IBGE Localidades**: https://servicodados.ibge.gov.br/api/docs/localidades
-
-**IBGE SIDRA**: tabela 4714, variável 93, população residente no Censo 2022. A população permanece identificada como 2022, independentemente do ano fiscal. O valor por habitante usa essa mesma base e não uma estimativa anual.
-
-**Tesouro/Siconfi**: https://apidatalake.tesouro.gov.br/docs/siconfi/
-
-Consulta DCA, anexo I-E, por código IBGE e exercício. O total vem de “Despesas Exceto Intraorçamentárias”. Apenas funções no formato `10 - Saúde` compõem o detalhamento; subfunções como `10.301 - Atenção Básica` são excluídas para evitar dupla contagem. Valores são nominais e não corrigidos pela inflação. A API é consultada em fila, com intervalo mínimo de 1,1 segundo; requisições têm timeout de 30 segundos, cache em memória de 15 minutos e paginação limitada a 10 páginas. Falha de paginação não produz total parcial.
-
-Dados ausentes não são convertidos em zero. O município pode não ter enviado declaração em determinado exercício. Divergências de fechamento entre total e funções não são corrigidas artificialmente pelo painel. A data exibida é de consulta, não de publicação da fonte. Não há dados financeiros fictícios ou fallback silencioso para exemplos.
-
-**Portal da Transparência**: https://portaldatransparencia.gov.br/api-de-dados
-
-O endpoint de Bolsa Família está implementado, mas requer uma chave para validação em ambiente real. Cadastre seu e-mail em https://portaldatransparencia.gov.br/api-de-dados/cadastrar-email, copie `.env.example` para `.env` e preencha `TRANSPARENCIA_API_KEY`. Reinicie o servidor depois da configuração. A chave é enviada no header `chave-api-dados` apenas pelo backend. Nunca use prefixo `VITE_`, coloque chaves em `dados_api.txt` ou versione `.env`.
-
-Benefícios federais possuem escopo distinto das despesas municipais e não são somados ao orçamento da prefeitura.
-
-**dados.gov.br**: https://dados.gov.br/dados/conjuntos-dados
-
-Disponível como link externo na seção de fontes. A API do catálogo **não está integrada** nesta versão.
-
-## Estrutura
-
-```text
-src/main.tsx              Painel e componentes
-src/styles.css           Identidade visual e responsividade
-server/index.mjs         API, conectores, cache e fila do Tesouro
-server/domain.mjs        Validação e normalização contábil
-server/domain.test.mjs   Testes de dupla contagem, ausências e validação
-```
-
-## Próximas evoluções
-
-Persistir consultas e cache, acrescentar séries históricas com correção pelo IPCA, implementar comparação entre municípios e integrar o catálogo dados.gov.br após definir autenticação e recorte dos conjuntos. O servidor já limita consultas a 60 por minuto por IP; para ampliar o uso público, evoluir observabilidade, cache e limites compartilhados entre instâncias.
-#   b r a s i l - a b e r t o  
- #   b r a s i l - a b e r t o  
- 
+</div>
