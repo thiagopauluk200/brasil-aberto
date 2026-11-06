@@ -155,4 +155,5 @@ server/domain.test.mjs   Testes de dupla contagem, ausências e validação
 
 Persistir consultas e cache, acrescentar séries históricas com correção pelo IPCA, implementar comparação entre municípios e integrar o catálogo dados.gov.br após definir autenticação e recorte dos conjuntos. O servidor já limita consultas a 60 por minuto por IP; para ampliar o uso público, evoluir observabilidade, cache e limites compartilhados entre instâncias.
 #   b r a s i l - a b e r t o  
+ #   b r a s i l - a b e r t o  
  
